@@ -6,6 +6,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { registerRoute } from "../utils/APIRoutes";
+import { io } from "socket.io-client";
+import { host } from "../utils/APIRoutes";
 
 
 const Register = () => {
@@ -27,6 +29,10 @@ const Register = () => {
     if (localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY)) {
       navigate("/");
     }
+    const socks = io(host)
+          socks.on("users-recieve", (user) => {
+            setConts(user)
+          });
   }, []);
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });

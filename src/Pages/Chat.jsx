@@ -9,12 +9,14 @@ import Contacts from "../components/Contacts";
 import Welcome from "../components/Welcome";
 
 export default function Chat() {
+  const sock = io(host)
   const navigate = useNavigate();
   const socket = useRef();
   const [contacts, setContacts] = useState([]);
   const [conts, setConts] = useState([])
   const [currentChat, setCurrentChat] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
+
 
   const getFunction = async()=>{
     if (!localStorage.getItem(import.meta.env.VITE_REACT_APP_LOCALHOST_KEY)) {
@@ -33,18 +35,14 @@ export default function Chat() {
   useEffect(() => {
     if (currentUser) {
       socket.current = io(host);
-      socket.current.emit("add-user", currentUser._id);
+      // socket.current.emit("add-user", currentUser._id);
     }
   }, [currentUser]);
   const someFunction = async()=>{
     if (currentUser) {
-          const socks = io(host)
-          socks.on("users-recieve", (user) => {
-            setConts(user)
-          });
       if (currentUser.isAvatarImageSet) {
         const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-        conts && setContacts(data.data);
+        setContacts(data.data);
       } else {
         navigate("/setAvatar");
       }
@@ -53,6 +51,9 @@ export default function Chat() {
 
   useEffect(() => {
     someFunction()
+    sock.on("newUser", (someData)=>{
+      setContacts([...contacts, someData]);
+    })
   }, [currentUser]);
   const handleChatChange = (chat) => {
     setCurrentChat(chat);
